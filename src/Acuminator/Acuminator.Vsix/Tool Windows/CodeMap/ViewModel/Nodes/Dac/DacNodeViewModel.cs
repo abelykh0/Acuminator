@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -19,7 +20,21 @@ namespace Acuminator.Vsix.ToolWindows.CodeMap
 
 		public override string Name
 		{
-			get => DacModel.Symbol.Name;
+			get 
+			{
+				StringBuilder name = new StringBuilder(DacModel.Symbol.Name);
+
+				var cacheNameAttribute = DacModel.Symbol.GetAttributes().FirstOrDefault(a => a?.AttributeClass?.ToString() == "PX.Data.PXCacheNameAttribute");
+				if (cacheNameAttribute != null && cacheNameAttribute.ConstructorArguments.Length > 0)
+				{
+					var nameArgument = cacheNameAttribute.ConstructorArguments[0];
+					name.Append(" (");
+					name.Append(nameArgument.Value?.ToString());
+					name.Append(")");
+				}
+
+				return name.ToString();
+			}
 			protected set { }
 		}
 
